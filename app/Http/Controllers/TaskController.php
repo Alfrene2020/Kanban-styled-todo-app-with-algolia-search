@@ -29,7 +29,7 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-
+        return Tasks::create($request->all());
     }
     
     public function change(Tasks $id, $status)

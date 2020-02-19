@@ -21,3 +21,4 @@ Route::get('pending', 'TaskController@pending');
 Route::get('current', 'TaskController@current');
 Route::get('finished', 'TaskController@finished');
 Route::post('changestatus/{id}/{status}', 'TaskController@change');
+Route::post('addtask', 'TaskController@store');
