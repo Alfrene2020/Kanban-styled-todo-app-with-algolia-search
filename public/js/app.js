@@ -74613,6 +74613,240 @@ function plural(ms, n, name) {
 
 /***/ }),
 
+/***/ "./node_modules/sweetalert2-react-content/dist/sweetalert2-react-content.umd.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/sweetalert2-react-content/dist/sweetalert2-react-content.umd.js ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/** @preserve
+  * package: sweetalert2-react-content v3.0.0
+  * file: dist/sweetalert2-react-content.umd.js
+  * homepage: https://github.com/sweetalert2/sweetalert2-react-content#readme
+  * license: MIT
+  **/
+
+(function (global, factory) {
+   true ? module.exports = factory(__webpack_require__(/*! react */ "./node_modules/react/index.js"), __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js")) :
+  undefined;
+}(this, (function (React, ReactDOM) { 'use strict';
+
+  React = React && React.hasOwnProperty('default') ? React['default'] : React;
+  ReactDOM = ReactDOM && ReactDOM.hasOwnProperty('default') ? ReactDOM['default'] : ReactDOM;
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) _setPrototypeOf(subClass, superClass);
+  }
+
+  function _getPrototypeOf(o) {
+    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+      return o.__proto__ || Object.getPrototypeOf(o);
+    };
+    return _getPrototypeOf(o);
+  }
+
+  function _setPrototypeOf(o, p) {
+    _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    return _setPrototypeOf(o, p);
+  }
+
+  function _assertThisInitialized(self) {
+    if (self === void 0) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return self;
+  }
+
+  function _possibleConstructorReturn(self, call) {
+    if (call && (typeof call === "object" || typeof call === "function")) {
+      return call;
+    }
+
+    return _assertThisInitialized(self);
+  }
+
+  function _superPropBase(object, property) {
+    while (!Object.prototype.hasOwnProperty.call(object, property)) {
+      object = _getPrototypeOf(object);
+      if (object === null) break;
+    }
+
+    return object;
+  }
+
+  function _get(target, property, receiver) {
+    if (typeof Reflect !== "undefined" && Reflect.get) {
+      _get = Reflect.get;
+    } else {
+      _get = function _get(target, property, receiver) {
+        var base = _superPropBase(target, property);
+
+        if (!base) return;
+        var desc = Object.getOwnPropertyDescriptor(base, property);
+
+        if (desc.get) {
+          return desc.get.call(receiver);
+        }
+
+        return desc.value;
+      };
+    }
+
+    return _get(target, property, receiver || target);
+  }
+
+  var mounts = [{
+    key: 'title',
+    getter: function getter(swal) {
+      return swal.getTitle();
+    }
+  }, {
+    key: 'html',
+    getter: function getter(swal) {
+      return swal.getHtmlContainer();
+    }
+  }, {
+    key: 'confirmButtonText',
+    getter: function getter(swal) {
+      return swal.getConfirmButton();
+    }
+  }, {
+    key: 'cancelButtonText',
+    getter: function getter(swal) {
+      return swal.getCancelButton();
+    }
+  }, {
+    key: 'footer',
+    getter: function getter(swal) {
+      return swal.getFooter();
+    }
+  }];
+
+  var noop = function noop() {}; // eslint-disable-line @typescript-eslint/no-empty-function
+
+
+  var error = function error(message) {
+    return new Error("sweetalert2-react-content: ".concat(message));
+  };
+
+  function withReactContent(ParentSwal) {
+    return (
+      /*#__PURE__*/
+      function (_ParentSwal) {
+        _inherits(_class, _ParentSwal);
+
+        function _class() {
+          _classCallCheck(this, _class);
+
+          return _possibleConstructorReturn(this, _getPrototypeOf(_class).apply(this, arguments));
+        }
+
+        _createClass(_class, [{
+          key: "_main",
+          value: function _main(params) {
+            params = Object.assign({}, params);
+            params.onOpen = params.onOpen || noop;
+            params.onDestroy = params.onDestroy || noop;
+            mounts.forEach(function (_ref) {
+              var key = _ref.key,
+                  getter = _ref.getter;
+
+              if (React.isValidElement(params[key])) {
+                var reactElement = params[key];
+                params[key] = ' ';
+                var domElement;
+                var superOnOpen = params.onOpen;
+
+                params.onOpen = function (element) {
+                  domElement = getter(ParentSwal);
+                  ReactDOM.render(reactElement, domElement);
+                  superOnOpen(element);
+                };
+
+                var superOnDestroy = params.onDestroy;
+
+                params.onDestroy = function (element) {
+                  superOnDestroy(element);
+                  ReactDOM.unmountComponentAtNode(domElement);
+                };
+              }
+            });
+            return _get(_getPrototypeOf(_class.prototype), "_main", this).call(this, params);
+          }
+        }, {
+          key: "update",
+          value: function update() {
+            throw error('Swal.update() is not yet supported. See https://github.com/sweetalert2/sweetalert2-react-content/issues/73');
+          }
+        }], [{
+          key: "argsToParams",
+          value: function argsToParams(args) {
+            if (React.isValidElement(args[0]) || React.isValidElement(args[1])) {
+              var params = {};
+              ['title', 'html', 'icon'].forEach(function (name, index) {
+                if (args[index] !== undefined) {
+                  params[name] = args[index];
+                }
+              });
+              return params;
+            } else {
+              return ParentSwal.argsToParams(args);
+            }
+          }
+        }]);
+
+        return _class;
+      }(ParentSwal)
+    );
+  }
+
+  return withReactContent;
+
+})));
+//# sourceMappingURL=sweetalert2-react-content.umd.js.map
+
+
+/***/ }),
+
 /***/ "./node_modules/sweetalert2/dist/sweetalert2.all.js":
 /*!**********************************************************!*\
   !*** ./node_modules/sweetalert2/dist/sweetalert2.all.js ***!
@@ -78124,7 +78358,7 @@ function (_Component) {
     key: "render",
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mr-2"
+        className: "bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mr-2 my-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         className: "appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none",
         type: "text",
@@ -78171,10 +78405,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-beautiful-dnd */ "./node_modules/react-beautiful-dnd/dist/react-beautiful-dnd.esm.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _Inputfield__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Inputfield */ "./resources/js/components/Inputfield.js");
+/* harmony import */ var sweetalert2_react_content__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! sweetalert2-react-content */ "./node_modules/sweetalert2-react-content/dist/sweetalert2-react-content.umd.js");
+/* harmony import */ var sweetalert2_react_content__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(sweetalert2_react_content__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-beautiful-dnd */ "./node_modules/react-beautiful-dnd/dist/react-beautiful-dnd.esm.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _Inputfield__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Inputfield */ "./resources/js/components/Inputfield.js");
+/* harmony import */ var _logo_png__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./logo.png */ "./resources/js/components/logo.png");
+/* harmony import */ var _logo_png__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_logo_png__WEBPACK_IMPORTED_MODULE_8__);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
@@ -78210,6 +78448,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
 var socket;
 
 var Main =
@@ -78234,6 +78474,7 @@ function (_Component) {
     _this.move = _this.move.bind(_assertThisInitialized(_this));
     _this.broadcast = _this.broadcast.bind(_assertThisInitialized(_this));
     _this.toggleInputField = _this.toggleInputField.bind(_assertThisInitialized(_this));
+    _this.deleteTask = _this.deleteTask.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -78428,7 +78669,47 @@ function (_Component) {
   }, {
     key: "deleteTask",
     value: function deleteTask(e) {
+      var _this3 = this;
+
       console.log(e.target.value);
+      e.preventDefault();
+      var MySwal = sweetalert2_react_content__WEBPACK_IMPORTED_MODULE_4___default()(sweetalert2__WEBPACK_IMPORTED_MODULE_3___default.a);
+      var id = e.target.value;
+      MySwal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.value) {
+          axios__WEBPACK_IMPORTED_MODULE_2___default.a.post("/api/removetask/".concat(id)).then(function (response) {
+            MySwal.fire({
+              title: 'Deleted!',
+              text: 'Task has been removed successfully.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            });
+
+            _this3.fetchData();
+
+            socket.emit('update');
+          }).then(function (error) {
+            console.log(error);
+          });
+        } else if (result.dismiss === sweetalert2__WEBPACK_IMPORTED_MODULE_3___default.a.DismissReason.cancel) {
+          MySwal.fire({
+            title: 'Cancelled',
+            text: '',
+            icon: 'error',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      });
     }
   }, {
     key: "toggleInputField",
@@ -78442,7 +78723,7 @@ function (_Component) {
   }, {
     key: "addNewTask",
     value: function addNewTask(newTask) {
-      var _this3 = this;
+      var _this4 = this;
 
       var taskObject = {
         tasks: newTask
@@ -78455,7 +78736,11 @@ function (_Component) {
           timer: 1500
         });
 
-        _this3.toggleInputField();
+        _this4.toggleInputField();
+
+        _this4.fetchData();
+
+        socket.emit('update');
       })["catch"](function (errors) {
         console.log(errors);
       });
@@ -78463,28 +78748,41 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!socket) {
-        socket = socket_io_client__WEBPACK_IMPORTED_MODULE_5___default()(':8001');
+        socket = socket_io_client__WEBPACK_IMPORTED_MODULE_6___default()(':8001');
         socket.on('event', function (data, sDropppable, dDroppaple) {
           console.log("data recieved");
 
-          _this4.updateData(data, sDropppable, dDroppaple);
+          _this5.updateData(data, sDropppable, dDroppaple);
+        });
+        socket.on('update', function () {
+          _this5.fetchData();
         });
       }
 
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "bg-primary h-screen"
+        className: "h-screen flex bg-navajowhite font-comic"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "container mx-auto flex",
-        style: {
-          height: '70%'
-        }
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["DragDropContext"], {
+        className: "bg-rosybrown border-r-4 border-dashed w-auto"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+        href: "#"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+        className: "h-24 object-scale-down w-full",
+        src: _logo_png__WEBPACK_IMPORTED_MODULE_8___default.a,
+        alt: "Logo"
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "font-semibold mt-24 text-center text-xl w-full"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+        href: "#",
+        className: "text-white hover:underline"
+      }, "All"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "ml-3 container mx-auto flex h-full"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["DragDropContext"], {
         onDragEnd: this.onDragEnd
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "w-32 bg-secondary border-indigo-700 border-2 rounded-b-lg rounded-t-lg mt-10 flex-auto mr-16 shadow-xl"
+        className: "border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto mr-3 shadow-xl"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "relative ml-2 pt-1 font-semibold"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
@@ -78495,99 +78793,103 @@ function (_Component) {
         onClick: this.toggleInputField,
         type: "submit",
         className: "teaxt-2x1 hover:bg-green-400 border pb-1 text-white font-bold px-4 rounded-full"
-      }, "+")), this.state.clicked && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Inputfield__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      }, "+")), this.state.clicked && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Inputfield__WEBPACK_IMPORTED_MODULE_7__["default"], {
         addNewTask: this.addNewTask.bind(this),
         toggleInputField: this.toggleInputField
-      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["Droppable"], {
+      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["Droppable"], {
         droppableId: "droppablePending"
       }, function (provided) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
-          className: "overflow-x-hidden h-0 overflow-y-auto absolute min-h-58",
+          className: "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58",
           style: {
             width: '28%'
           },
           ref: provided.innerRef
-        }, provided.droppableProps), _this4.state.pending.map(function (pending, index) {
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["Draggable"], {
+        }, provided.droppableProps), _this5.state.pending.map(function (pending, index) {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["Draggable"], {
             draggableId: "".concat(pending.id),
             key: pending.id,
             index: index
           }, function (provided, snapshot) {
             return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
               key: index,
-              className: "bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
+              className: "bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
             }, provided.draggableProps, provided.dragHandleProps, {
               ref: provided.innerRef
             }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, pending.tasks), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
               className: "absolute inset-y-0 right-0 pr-4 pt-3"
             }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
               value: pending.id,
-              onClick: _this4.deleteTask,
+              onClick: _this5.deleteTask,
               type: "submit",
               className: "hover:bg-red-500 text-white font-bold px-4 rounded-full"
             }, "X")), provided.placeholder);
           });
         }), provided.placeholder);
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "bg-secondary border-indigo-700 border-2 rounded-b-lg rounded-t-lg mt-10 flex-auto shadow-xl"
+        className: "border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto shadow-xl"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "ml-2 pt-1 font-semibold"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
         className: "text-gray-100 mb-2 mt-3"
-      }, "CURRENT TASK")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["Droppable"], {
+      }, "CURRENT TASK")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["Droppable"], {
         droppableId: "droppableCurrent"
       }, function (provided) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
-          className: "overflow-x-hidden h-0 overflow-y-auto absolute min-h-58",
+          className: "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58",
           style: {
             width: '28%'
           },
           ref: provided.innerRef
-        }, provided.droppableProps), _this4.state.current.map(function (current, index) {
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["Draggable"], {
+        }, provided.droppableProps), _this5.state.current.map(function (current, index) {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["Draggable"], {
             draggableId: "".concat(current.id),
             key: current.id,
             index: index
           }, function (provided, snapshot) {
             return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
               key: index,
-              className: "bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
+              className: "bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
             }, provided.draggableProps, provided.dragHandleProps, {
               ref: provided.innerRef
             }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, current.tasks), provided.placeholder);
           });
         }), provided.placeholder);
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "bg-secondary border-indigo-700 border-2 rounded-b-lg rounded-t-lg mt-10 flex-auto ml-16 shadow-xl"
+        className: "border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto ml-3 shadow-xl"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "ml-2 pt-1 font-semibold"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
         className: "text-gray-100 mb-2 mt-3"
-      }, "FINISHED TASK")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["Droppable"], {
+      }, "FINISHED TASK")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["Droppable"], {
         droppableId: "droppableFinished"
       }, function (provided) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
-          className: "overflow-x-hidden h-0 overflow-y-auto absolute min-h-58",
+          className: "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58",
           style: {
             width: '28%'
           },
           ref: provided.innerRef
-        }, provided.droppableProps), _this4.state.finished.map(function (finished, index) {
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_4__["Draggable"], {
+        }, provided.droppableProps), _this5.state.finished.map(function (finished, index) {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_beautiful_dnd__WEBPACK_IMPORTED_MODULE_5__["Draggable"], {
             draggableId: "".concat(finished.id),
             key: finished.id,
             index: index
           }, function (provided, snapshot) {
             return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
               key: index,
-              className: "bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
+              className: "bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
             }, provided.draggableProps, provided.dragHandleProps, {
               ref: provided.innerRef
-            }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, finished.tasks), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+              style: {
+                textDecoration: "line-through"
+              }
+            }, finished.tasks), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
               className: "absolute inset-y-0 right-0 pr-4 pt-3"
             }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
               value: finished.id,
-              onClick: _this4.deleteTask,
+              onClick: _this5.deleteTask,
               type: "submit",
               className: "hover:bg-red-500 text-white font-bold px-4 rounded-full"
             }, "X")), provided.placeholder);
@@ -78605,6 +78907,17 @@ function (_Component) {
 if (document.getElementById('root')) {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Main, null), document.getElementById('root'));
 }
+
+/***/ }),
+
+/***/ "./resources/js/components/logo.png":
+/*!******************************************!*\
+  !*** ./resources/js/components/logo.png ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "/images/logo.png?8b752670cd00e356ad78ab94ee688688";
 
 /***/ }),
 

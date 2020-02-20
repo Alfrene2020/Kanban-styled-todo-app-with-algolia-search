@@ -16,13 +16,15 @@ app.get('/', (req, res) => {
 io.on('connection', function(socket){
     connected.push(socket);
     console.log('user connected: ' + connected.length);
-   
-    io.emit('this', 'user Connected');
 
     socket.on('event', (data, sourceDroppable, destinationDroppable) => {
         // console.log(JSON.stringify(data));
         socket.broadcast.emit('event', data, sourceDroppable, destinationDroppable);
     });
+
+    socket.on('update',()  => {
+        socket.broadcast.emit('update');
+    })
 
     socket.on('disconnect', function(data){
         connected.splice(connected.indexOf(socket), 1);

@@ -39,7 +39,8 @@ class TaskController extends Controller
         return $id;
     }
 
-    public function destroy(todo $id)
+    public function destroy(Tasks $id)
     {
+        $id->delete();
     }
 }

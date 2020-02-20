@@ -12,7 +12,7 @@ export class Inputfield extends Component
   render()
   {
       return(
-        <div className="bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mr-2">
+        <div className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mr-2 my-2">
           <input 
             className = "appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none" 
             type="text" 

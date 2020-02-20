@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import io from 'socket.io-client';
 import Inputfield from './Inputfield';
+import Logo from "./logo.png"
 
 let socket;
 
@@ -25,6 +27,7 @@ export default class Main extends Component {
         this.move = this.move.bind(this);
         this.broadcast = this.broadcast.bind(this);
         this.toggleInputField = this.toggleInputField.bind(this);
+        this.deleteTask = this.deleteTask.bind(this);
     }
 
     broadcast(object, sourceDroppable, destinationDroppable){
@@ -191,6 +194,46 @@ export default class Main extends Component {
 
     deleteTask(e){
         console.log(e.target.value);
+        e.preventDefault();
+        const MySwal = withReactContent(Swal);
+        const id = e.target.value;
+
+        MySwal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
+                axios.post(`/api/removetask/${id}`).then(response => {
+                    MySwal.fire({
+                        title: 'Deleted!',
+                        text: 'Task has been removed successfully.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    })
+
+                    this.fetchData();
+                    socket.emit('update');
+                }).then(error => {
+                    console.log(error);
+                })
+            } else if (
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                MySwal.fire({
+                title: 'Cancelled',
+                text: '',
+                icon: 'error',
+                timer: 1500,
+                showConfirmButton: false,
+                })
+            }
+        })
     }
 
     toggleInputField(){
@@ -214,6 +257,8 @@ export default class Main extends Component {
               });
             
             this.toggleInputField();
+            this.fetchData();
+            socket.emit('update');
         }).catch(errors => {
             console.log(errors);
         })
@@ -226,13 +271,25 @@ export default class Main extends Component {
                 console.log("data recieved");
                 this.updateData(data, sDropppable, dDroppaple);
             });
+            socket.on('update',() => {
+                this.fetchData();
+            })
         }
         return (
-            <div className="bg-primary h-screen">
-                <div className="container mx-auto flex" style={{height: '70%'}}>
+            <div className="h-screen flex bg-navajowhite font-comic">
+                <div className = "bg-rosybrown border-r-4 border-dashed w-auto">
+                    <div>
+                    <a href='#'><img className = "h-24 object-scale-down w-full" src={Logo} alt="Logo" /></a>
+                    </div>
+                    <div className = "font-semibold mt-24 text-center text-xl w-full">
+                        <a href='#' className="text-white hover:underline">All</a>
+                    </div>
+                </div>
+                
+                <div className="ml-3 container mx-auto flex h-full">
                     <DragDropContext onDragEnd={this.onDragEnd}>
 
-                        <div className="w-32 bg-secondary border-indigo-700 border-2 rounded-b-lg rounded-t-lg mt-10 flex-auto mr-16 shadow-xl">
+                        <div className="border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto mr-3 shadow-xl">
                             <div className="relative ml-2 pt-1 font-semibold">
                                 <h4 className="text-gray-100 mb-2 mt-3">PENDING TASK</h4>
                                 <div className = "absolute inset-y-0 right-0 pr-4 pt-3">
@@ -244,13 +301,13 @@ export default class Main extends Component {
                             </div>
                             <Droppable droppableId="droppablePending">
                                 {provided => (
-                                    <div className = "overflow-x-hidden h-0 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
+                                    <div className = "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
                                         {this.state.pending.map((pending, index) =>
                                             <Draggable draggableId = {`${pending.id}`} key={pending.id} index={index}>
                                                 {(provided, snapshot) => (
                                                     <div 
                                                         key={index}
-                                                        className="bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
+                                                        className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                         ref={provided.innerRef}
@@ -272,19 +329,19 @@ export default class Main extends Component {
                             </Droppable>
                         </div>
 
-                        <div className="bg-secondary border-indigo-700 border-2 rounded-b-lg rounded-t-lg mt-10 flex-auto shadow-xl">
+                        <div className="border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto shadow-xl">
                             <div className = "ml-2 pt-1 font-semibold">
                                 <h4 className="text-gray-100 mb-2 mt-3">CURRENT TASK</h4>
                             </div>
                             <Droppable droppableId="droppableCurrent">
                                 {provided => (
-                                    <div className = "overflow-x-hidden h-0 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
+                                    <div className = "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
                                         {this.state.current.map((current, index) =>
                                             <Draggable draggableId = {`${current.id}`} key={current.id} index={index}>
                                                 {(provided, snapshot) => (
                                                     <div 
                                                         key={index} 
-                                                        className="bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
+                                                        className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                         ref={provided.innerRef}
@@ -301,24 +358,24 @@ export default class Main extends Component {
                             </Droppable>
                         </div>
 
-                        <div className="bg-secondary border-indigo-700 border-2 rounded-b-lg rounded-t-lg mt-10 flex-auto ml-16 shadow-xl">
+                        <div className="border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto ml-3 shadow-xl">
                             <div className="ml-2 pt-1 font-semibold">
                                 <h4 className="text-gray-100 mb-2 mt-3">FINISHED TASK</h4>
                             </div>
                             <Droppable droppableId="droppableFinished">
                                 {provided => (
-                                    <div className = "overflow-x-hidden h-0 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
+                                    <div className = "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
                                         {this.state.finished.map((finished, index) =>
                                             <Draggable draggableId = {`${finished.id}`} key={finished.id} index={index}>
                                                 {(provided, snapshot) => (
                                                     <div 
                                                         key={index} 
-                                                        className="bg-secondary hover:bg-blue-900 text-white border-indigo-700 relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2" 
+                                                        className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2" 
                                                         {...provided.draggableProps} 
                                                         {...provided.dragHandleProps} 
                                                         ref={provided.innerRef}
                                                     >
-                                                        <p>{finished.tasks}</p>
+                                                        <p style={{textDecoration: "line-through"}}>{finished.tasks}</p>
                                                         <div className = "absolute inset-y-0 right-0 pr-4 pt-3">
                                                             <button value={finished.id} onClick={this.deleteTask} type="submit" className="hover:bg-red-500 text-white font-bold px-4 rounded-full">
                                                                 X
