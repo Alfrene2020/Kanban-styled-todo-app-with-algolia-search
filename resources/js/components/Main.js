@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import axios from 'axios';
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import io from 'socket.io-client';
-import Inputfield from './Inputfield';
+import axios from 'axios'
 import Logo from "./logo.png"
+import Swal from 'sweetalert2'
+import ReactDOM from 'react-dom'
+import io from 'socket.io-client'
+import SearchTask from './SearchTask'
+import TabledTasks from './TabledTasks'
+import React, { Component } from 'react'
+import withReactContent from 'sweetalert2-react-content'
+import {BrowserRouter as Router, Link, Route} from 'react-router-dom'
 
 let socket;
 
@@ -22,38 +23,14 @@ export default class Main extends Component {
             clicked: false,
         }
 
-        this.onDragEnd = this.onDragEnd.bind(this);
-        this.changeStatus = this.changeStatus.bind(this);
         this.move = this.move.bind(this);
+        this.onDragEnd = this.onDragEnd.bind(this);
         this.broadcast = this.broadcast.bind(this);
-        this.toggleInputField = this.toggleInputField.bind(this);
         this.deleteTask = this.deleteTask.bind(this);
-    }
-
-    broadcast(object, sourceDroppable, destinationDroppable){
-        socket.emit('event', object, sourceDroppable, destinationDroppable);
-    }
-
-    componentDidMount()
-    {
-        this._isMounted = true;
-        this.fetchData()
-    }
-    componentWillUnmount()
-    {
-        this._isMounted = false;
-    }
-
-    droppableIdLists(id){
-        if(id === "droppablePending"){
-            return this.state.pending
-        }
-        if(id === "droppableCurrent"){
-            return this.state.current
-        }
-        if(id === "droppableFinished"){
-            return this.state.finished
-        }
+        this.addNewTask = this.addNewTask.bind(this);
+        this.changeStatus = this.changeStatus.bind(this);
+        this.toggleInputField = this.toggleInputField.bind(this);
+        
     }
 
     fetchData()
@@ -92,9 +69,47 @@ export default class Main extends Component {
         })
     }
 
-    changeStatus(id,status){
-        axios.post(`/api/changestatus/${id}/${status}`).then(response => {
-            console.log('success!');
+    deleteTask(e){
+        console.log(e.target.value);
+        e.preventDefault();
+        const MySwal = withReactContent(Swal);
+        const id = e.target.value;
+
+        MySwal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+            }).then((result) => {
+            if (result.value) {
+                axios.post(`/api/removetask/${id}`).then(response => {
+                    MySwal.fire({
+                        title: 'Deleted!',
+                        text: 'Task has been removed successfully.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    })
+                    this.fetchData();
+                    socket.emit('update');
+
+                }).then(error => {
+                    console.log(error);
+                })
+            } else if (
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                MySwal.fire({
+                title: 'Cancelled',
+                text: '',
+                icon: 'error',
+                timer: 1500,
+                showConfirmButton: false,
+                })
+            }
         })
     }
 
@@ -104,22 +119,7 @@ export default class Main extends Component {
         })
     }
 
-    move(source, destination, droppableSource, droppableDestination){
-        const sourceClone = Array.from(source);
-        const destClone = Array.from(destination);
-        const [removed] = sourceClone.splice(droppableSource.index, 1);
-    
-        destClone.splice(droppableDestination.index, 0, removed);
-    
-        const result = {};
-        result[droppableSource.droppableId] = sourceClone;
-        result[droppableDestination.droppableId] = destClone;
-
-        return(result);
-    }
-
-    onDragEnd(result)
-    {
+    onDragEnd(result){
         const { destination, source, draggableId } = result;
 
         if(!destination){
@@ -144,16 +144,88 @@ export default class Main extends Component {
             
             this.updateData(result, source.droppableId, destination.droppableId);
             this.broadcast(result, source.droppableId, destination.droppableId);
-            status = 0;
+            status = 'pending';
             if(destination.droppableId === "droppableCurrent"){
-                status = 1;
+                status = 'current';
             }
             if(destination.droppableId === "droppableFinished"){
-                status = 2;
+                status = 'finished';
             }
 
             this.changeStatus(draggableId, status);
         }
+    }
+
+    toggleInputField(){
+        const toggle = this.state.clicked;
+        if(!toggle){
+            document.getElementById("pendingdiv").className = "w-full relative overflow-x-hidden max-h-76% w-381 overflow-y-auto min-h-58";
+        } else {
+            document.getElementById("pendingdiv").className = "w-full relative overflow-x-hidden w-381 overflow-y-auto h-91%";
+        }
+        
+        this.setState({
+            clicked: !toggle
+        });
+        console.log(this.state.clicked);
+    }
+
+    componentDidMount(){
+        this._isMounted = true;
+        this.fetchData()
+    }
+
+    droppableIdLists(id){
+        if(id === "droppablePending"){
+            return this.state.pending
+        }
+        if(id === "droppableCurrent"){
+            return this.state.current
+        }
+        if(id === "droppableFinished"){
+            return this.state.finished
+        }
+    }
+
+    componentWillUnmount(){
+        this._isMounted = false;
+    }
+
+    changeStatus(id,status){
+        axios.post(`/api/changestatus/${id}/${status}`).then(response => {
+            console.log('success!');
+        })
+    }
+
+    addNewTask(newTask, description){
+        let taskObject = {
+            tasks: newTask,
+            description: description
+        }
+        axios.post('/api/addtask', taskObject).then(response => {
+            if(response.data == '1'){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Task has been added',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                
+                this.toggleInputField();
+                this.fetchData();
+                socket.emit('update');
+            }else{
+                Swal.fire({
+                    title: 'Task already exist',
+                    icon: 'warning',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            }
+            // ('update');
+        }).catch(errors => {
+            console.log(errors);
+        })
     }
 
     updateData(data, sourceDroppable, destinationDroppable){
@@ -192,78 +264,24 @@ export default class Main extends Component {
         }
     }
 
-    deleteTask(e){
-        console.log(e.target.value);
-        e.preventDefault();
-        const MySwal = withReactContent(Swal);
-        const id = e.target.value;
-
-        MySwal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel!',
-            reverseButtons: true
-            }).then((result) => {
-            if (result.value) {
-                axios.post(`/api/removetask/${id}`).then(response => {
-                    MySwal.fire({
-                        title: 'Deleted!',
-                        text: 'Task has been removed successfully.',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false,
-                    })
-
-                    this.fetchData();
-                    socket.emit('update');
-                }).then(error => {
-                    console.log(error);
-                })
-            } else if (
-                result.dismiss === Swal.DismissReason.cancel
-            ) {
-                MySwal.fire({
-                title: 'Cancelled',
-                text: '',
-                icon: 'error',
-                timer: 1500,
-                showConfirmButton: false,
-                })
-            }
-        })
+    broadcast(object, sourceDroppable, destinationDroppable){
+        socket.emit('event', object, sourceDroppable, destinationDroppable);
     }
 
-    toggleInputField(){
-        const toggle = this.state.clicked;
-        this.setState({
-            clicked: !toggle
-        });
-        console.log(this.state.clicked);
-    }
-
-    addNewTask(newTask){
-        let taskObject = {
-            tasks: newTask
-        }
-        axios.post('/api/addtask', taskObject).then(response => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Task has been added',
-                showConfirmButton: false,
-                timer: 1500
-              });
-            
-            this.toggleInputField();
-            this.fetchData();
-            socket.emit('update');
-        }).catch(errors => {
-            console.log(errors);
-        })
-    }
+    move(source, destination, droppableSource, droppableDestination){
+        const sourceClone = Array.from(source);
+        const destClone = Array.from(destination);
+        const [removed] = sourceClone.splice(droppableSource.index, 1);
     
+        destClone.splice(droppableDestination.index, 0, removed);
+    
+        const result = {};
+        result[droppableSource.droppableId] = sourceClone;
+        result[droppableDestination.droppableId] = destClone;
+
+        return(result);
+    }
+
     render() {
         if(!socket){
             socket = io(':8001');
@@ -276,124 +294,36 @@ export default class Main extends Component {
             })
         }
         return (
-            <div className="h-screen flex bg-navajowhite font-comic">
-                <div className = "bg-rosybrown border-r-4 border-dashed w-auto">
-                    <div>
-                    <a href='#'><img className = "h-24 object-scale-down w-full" src={Logo} alt="Logo" /></a>
+            <Router>
+                <div className="h-screen flex bg-primary font-comic">
+                    <div className = "animated fadeInLeft bg-secondary border-r-2 w-auto border-plum">
+                        <div>
+                        <a href='#'><img className = "h-16 object-scale-down pl-5 pr-5" src={Logo} alt="Logo" /></a>
+                        </div>
+                        <div className="font-semibold mt-24 text-center text-xl w-full">
+                            <Link className="text-white hover:underline" to="/Tasks">Tasks</Link>
+                            <br/>
+                            <br/>
+                            <Link className="text-white hover:underline" to="/Search">Search Task</Link>
+                        </div>
                     </div>
-                    <div className = "font-semibold mt-24 text-center text-xl w-full">
-                        <a href='#' className="text-white hover:underline">All</a>
-                    </div>
+                    
+                    <div className="container mx-auto flex h-full">
+                        <Route path="/Search" render={() => <SearchTask fetchData={this.fetchData} 
+                                                                        socket={socket}
+                                                                        />}/>
+                        <Route path="/Tasks" render={() => <TabledTasks deleteTask={this.deleteTask} 
+                                                                        pending={this.state.pending} 
+                                                                        current={this.state.current} 
+                                                                        finished={this.state.finished}
+                                                                        clicked={this.state.clicked}
+                                                                        addNewTask={this.addNewTask}
+                                                                        toggleInputField={this.toggleInputField}
+                                                                        onDragEnd={this.onDragEnd}
+                                                                         />}/>
+                    </div> 
                 </div>
-                
-                <div className="ml-3 container mx-auto flex h-full">
-                    <DragDropContext onDragEnd={this.onDragEnd}>
-
-                        <div className="border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto mr-3 shadow-xl">
-                            <div className="relative ml-2 pt-1 font-semibold">
-                                <h4 className="text-gray-100 mb-2 mt-3">PENDING TASK</h4>
-                                <div className = "absolute inset-y-0 right-0 pr-4 pt-3">
-                                    <button onClick={this.toggleInputField} type="submit" className="teaxt-2x1 hover:bg-green-400 border pb-1 text-white font-bold px-4 rounded-full">
-                                        +
-                                    </button>
-                                </div>
-                                {this.state.clicked && <Inputfield addNewTask={this.addNewTask.bind(this)} toggleInputField={this.toggleInputField}/>}
-                            </div>
-                            <Droppable droppableId="droppablePending">
-                                {provided => (
-                                    <div className = "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
-                                        {this.state.pending.map((pending, index) =>
-                                            <Draggable draggableId = {`${pending.id}`} key={pending.id} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div 
-                                                        key={index}
-                                                        className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        ref={provided.innerRef}
-                                                    >
-                                                        <p>{pending.tasks}</p>
-                                                        <div className = "absolute inset-y-0 right-0 pr-4 pt-3">
-                                                            <button value={pending.id} onClick={this.deleteTask} type="submit" className="hover:bg-red-500 text-white font-bold px-4 rounded-full">
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                        {provided.placeholder}
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        )}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-
-                        <div className="border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto shadow-xl">
-                            <div className = "ml-2 pt-1 font-semibold">
-                                <h4 className="text-gray-100 mb-2 mt-3">CURRENT TASK</h4>
-                            </div>
-                            <Droppable droppableId="droppableCurrent">
-                                {provided => (
-                                    <div className = "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
-                                        {this.state.current.map((current, index) =>
-                                            <Draggable draggableId = {`${current.id}`} key={current.id} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div 
-                                                        key={index} 
-                                                        className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2"
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        ref={provided.innerRef}
-                                                    >
-                                                        <p>{current.tasks}</p>
-                                                        {provided.placeholder}
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        )}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-
-                        <div className="border-dashed w-32 bg-rosybrown border-2 rounded-b-lg rounded-t-lg mt-24 mb-24 flex-auto ml-3 shadow-xl">
-                            <div className="ml-2 pt-1 font-semibold">
-                                <h4 className="text-gray-100 mb-2 mt-3">FINISHED TASK</h4>
-                            </div>
-                            <Droppable droppableId="droppableFinished">
-                                {provided => (
-                                    <div className = "overflow-x-hidden max-h-410 w-381 overflow-y-auto absolute min-h-58" style = {{width: '28%'}} ref={provided.innerRef} {...provided.droppableProps}>
-                                        {this.state.finished.map((finished, index) =>
-                                            <Draggable draggableId = {`${finished.id}`} key={finished.id} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div 
-                                                        key={index} 
-                                                        className="bg-rosybrown hover:bg-peru border-navajowhite text-white relative border shadow rounded-full pt-3 pb-3 flex pl-6 mx-2 my-2" 
-                                                        {...provided.draggableProps} 
-                                                        {...provided.dragHandleProps} 
-                                                        ref={provided.innerRef}
-                                                    >
-                                                        <p style={{textDecoration: "line-through"}}>{finished.tasks}</p>
-                                                        <div className = "absolute inset-y-0 right-0 pr-4 pt-3">
-                                                            <button value={finished.id} onClick={this.deleteTask} type="submit" className="hover:bg-red-500 text-white font-bold px-4 rounded-full">
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                        {provided.placeholder}
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        )}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    </DragDropContext>
-                </div> 
-            </div>
+            </Router>
         );
     }
 }

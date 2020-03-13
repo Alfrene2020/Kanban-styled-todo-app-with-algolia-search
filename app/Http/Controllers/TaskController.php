@@ -14,22 +14,28 @@ class TaskController extends Controller
 
     public function pending()
     {
-        return Tasks::where('status', 0)->orderBy('status', 'asc')->orderBy('id', 'asc')->get();
+        return Tasks::where('status', 'pending')->orderBy('status', 'asc')->orderBy('id', 'asc')->get();
     }
 
     public function current()
     {
-        return Tasks::where('status', 1)->orderBy('status', 'asc')->orderBy('id', 'asc')->get();
+        return Tasks::where('status', 'current')->orderBy('status', 'asc')->orderBy('id', 'asc')->get();
     }
 
     public function finished()
     {
-        return Tasks::where('status', 2)->orderBy('status', 'asc')->orderBy('id', 'asc')->get();
+        return Tasks::where('status', 'finished')->orderBy('status', 'asc')->orderBy('id', 'asc')->get();
     }
 
     public function store(Request $request)
-    {
-        return Tasks::create($request->all());
+    { 
+        $task = Tasks::where('tasks', $request->tasks)->get();
+        if(count($task) == 0){
+            Tasks::create(['tasks' => $request->tasks, 'status' => 'pending', 'description' => $request->description]);
+            return '1';
+        } else {
+            return '0';
+        }
     }
     
     public function change(Tasks $id, $status)

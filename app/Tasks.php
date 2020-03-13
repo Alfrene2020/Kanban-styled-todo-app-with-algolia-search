@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Tasks extends Model
 {
-    public $timestamps = false;
-    protected $fillable = ['tasks', 'status'];
+    use Searchable;
+    
+    // public $timestamps = false;
+    protected $fillable = ['tasks', 'status', 'description'];
 }
