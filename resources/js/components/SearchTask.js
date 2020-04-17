@@ -2,7 +2,7 @@ import Swal from 'sweetalert2'
 import React, { Component } from 'react'
 import algoliasearch from 'algoliasearch/lite';
 import withReactContent from 'sweetalert2-react-content'
-import {InstantSearch, connectSearchBox, Hits, connectRefinementList, Highlight, Stats, SortBy } from 'react-instantsearch-dom';
+import {InstantSearch, connectSearchBox, InfiniteHits , connectRefinementList, Highlight, Stats, SortBy } from 'react-instantsearch-dom';
 
 const searchClient = algoliasearch(
     'AJILZUF45K',
@@ -29,8 +29,9 @@ export class SearchTask extends Component{
         return(
             <form noValidate action="" role="search" className="text-center">
             <input
-                className="bg-white rounded-lg px-2 text-center text-xl py-1 mt-4 mb-2 border-b-2 border-black"
+                className="bg-white rounded-lg px-2 text-center text-xl py-1 mt-4 mb-2 border-b-2 border-black text-black"
                 type="search"
+                style={{caretColor:"black"}}
                 value={currentRefinement}
                 onChange={event => refine(event.currentTarget.value)}
                 placeholder='Search Tasks'
@@ -181,7 +182,6 @@ export class SearchTask extends Component{
                  >
 
                     <div className="">
-                        {/* <SearchBox translation={{placeholder:'Search Tasks Here'}}/> */}
                         <CustomSearchBox/>
                         <div className="flex justify-between">
                             <Stats className="ml-40" />
@@ -192,8 +192,8 @@ export class SearchTask extends Component{
                                     defaultRefinement = "tasks"
                                     items={[
                                         {value: 'tasks', label: "Most Relevant"},
-                                        {value: 'tasks_id_desc', label: "creation(DESC)"},
-                                        {value: 'tasks_id_asc', label: "creation(ASC)"}
+                                        // {value: 'tasks_id_desc', label: "creation(DESC)"},
+                                        {value: 'tasks_id_asc', label: "creation"}
                                     ]}
                                 />
                             </div>
@@ -214,7 +214,7 @@ export class SearchTask extends Component{
                         <hr className="h-auto mr-2" style={{border:"none", borderLeft: "1px solid hsla(200, 10%, 50%,100)", width: "1px"}}/>
 
                         <div className='animated zoomIn point7 w-full relative overflow-x-hidden w-381 overflow-y-auto h-auto'>
-                            <Hits hitComponent={this.Hit}/>
+                            <InfiniteHits  hitComponent={this.Hit}/>
                             {/* <CustomHits /> */}
                         </div>
                     </div>

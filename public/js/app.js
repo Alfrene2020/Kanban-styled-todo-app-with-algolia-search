@@ -100238,8 +100238,11 @@ function (_Component) {
         role: "search",
         className: "text-center"
       }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
-        className: "bg-white rounded-lg px-2 text-center text-xl py-1 mt-4 mb-2 border-b-2 border-black",
+        className: "bg-white rounded-lg px-2 text-center text-xl py-1 mt-4 mb-2 border-b-2 border-black text-black",
         type: "search",
+        style: {
+          caretColor: "black"
+        },
         value: currentRefinement,
         onChange: function onChange(event) {
           return refine(event.currentTarget.value);
@@ -100416,12 +100419,10 @@ function (_Component) {
         items: [{
           value: 'tasks',
           label: "Most Relevant"
-        }, {
-          value: 'tasks_id_desc',
-          label: "creation(DESC)"
-        }, {
+        }, // {value: 'tasks_id_desc', label: "creation(DESC)"},
+        {
           value: 'tasks_id_asc',
-          label: "creation(ASC)"
+          label: "creation"
         }]
       })))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "flex h-83% w-auto mr-2 ml-2"
@@ -100449,7 +100450,7 @@ function (_Component) {
         }
       }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "animated zoomIn point7 w-full relative overflow-x-hidden w-381 overflow-y-auto h-auto"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_instantsearch_dom__WEBPACK_IMPORTED_MODULE_4__["Hits"], {
+      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_instantsearch_dom__WEBPACK_IMPORTED_MODULE_4__["InfiniteHits"], {
         hitComponent: this.Hit
       })))));
     }
